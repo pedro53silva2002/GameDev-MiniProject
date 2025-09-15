@@ -1,0 +1,8 @@
+TileMapLayer
+CanvasModulate
+PointLight2D
+DirectionalLight2D
+Sprite2D
+AnimatedSprite2D
+CharacterBody2D
+Node2D
