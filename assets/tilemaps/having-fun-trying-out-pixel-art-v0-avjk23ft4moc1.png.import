@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://co0vpo8uxgmit"
-path="res://.godot/imported/factory_spritesheet.png-1379edda680ab758be69c36848166f44.ctex"
+uid="uid://tnrf4kchaxnu"
+path="res://.godot/imported/having-fun-trying-out-pixel-art-v0-avjk23ft4moc1.png-7320715975ff3c9025e5a62be0a9ea4f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/player/factory_spritesheet.png"
-dest_files=["res://.godot/imported/factory_spritesheet.png-1379edda680ab758be69c36848166f44.ctex"]
+source_file="res://assets/tilemaps/having-fun-trying-out-pixel-art-v0-avjk23ft4moc1.png"
+dest_files=["res://.godot/imported/having-fun-trying-out-pixel-art-v0-avjk23ft4moc1.png-7320715975ff3c9025e5a62be0a9ea4f.ctex"]
 
 [params]
 

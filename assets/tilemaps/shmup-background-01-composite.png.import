@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://co0vpo8uxgmit"
-path="res://.godot/imported/factory_spritesheet.png-1379edda680ab758be69c36848166f44.ctex"
+uid="uid://ceutnw21ntx5p"
+path="res://.godot/imported/shmup-background-01-composite.png-29e04a9e81240705517415794afbe643.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/player/factory_spritesheet.png"
-dest_files=["res://.godot/imported/factory_spritesheet.png-1379edda680ab758be69c36848166f44.ctex"]
+source_file="res://assets/tilemaps/shmup-background-01-composite.png"
+dest_files=["res://.godot/imported/shmup-background-01-composite.png-29e04a9e81240705517415794afbe643.ctex"]
 
 [params]
 

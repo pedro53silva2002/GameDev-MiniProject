@@ -1,8 +1,10 @@
-TileMapLayer
-CanvasModulate
 PointLight2D
+LightOccluder2D
 DirectionalLight2D
 Sprite2D
+Camera2D
+TileMapLayer
+CanvasModulate
 AnimatedSprite2D
 CharacterBody2D
 Node2D

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://co0vpo8uxgmit"
-path="res://.godot/imported/factory_spritesheet.png-1379edda680ab758be69c36848166f44.ctex"
+uid="uid://l3uxwwxshbrr"
+path="res://.godot/imported/player_specular2 Copy.png-d1115480d0ee4cfeb8b9512f504aa07a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/player/factory_spritesheet.png"
-dest_files=["res://.godot/imported/factory_spritesheet.png-1379edda680ab758be69c36848166f44.ctex"]
+source_file="res://assets/player/player_specular2 Copy.png"
+dest_files=["res://.godot/imported/player_specular2 Copy.png-d1115480d0ee4cfeb8b9512f504aa07a.ctex"]
 
 [params]
 
