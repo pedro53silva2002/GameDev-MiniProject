@@ -1,15 +1,60 @@
-[gd_scene load_steps=5 format=3 uid="uid://c0angt1ohgxa0"]
+[gd_scene load_steps=7 format=3 uid="uid://c0angt1ohgxa0"]
 
 [ext_resource type="Texture2D" uid="uid://cjsqk701pjujb" path="res://assets/player/player.png" id="1_rkbax"]
 [ext_resource type="Texture2D" uid="uid://b3n12hsayw4be" path="res://assets/player/player_specular2.png" id="2_rkbax"]
+[ext_resource type="Texture2D" uid="uid://ccu61ecwbusgx" path="res://assets/tilemaps/istockphoto-1136961004-2048x2048.jpg" id="3_g1dw6"]
 
 [sub_resource type="GDScript" id="GDScript_rkbax"]
 script/source = "extends CharacterBody2D
+
+var direction : Vector2
+var speed : float = 200
+var accel : float = 200
+var friction : float = 200
+var gravity : float = 1000
+@onready var player: CharacterBody2D = $\".\"
+@onready var flashlight: ColorRect = $flashlight
+var rect_position = Vector2(0, 0)
+var rect_min_size = Vector2(100, 20)
+
+func _input(event: InputEvent) -> void:
+	if (event.is_action_pressed(\"mouse_left\")):
+		if (flashlight.visible):
+			flashlight.visible = false
+		else:
+			flashlight.visible = true
+
+func _physics_process(delta):
+	move(delta)
+	
+#func _ready():
+	#nothing
+	
+	
+func move(delta):
+	direction.x = Input.get_action_strength(\"d\") - Input.get_action_strength(\"a\")
+	direction.y =  Input.get_action_strength(\"s\") - Input.get_action_strength(\"w\")
+	if (player.is_on_floor()):
+		velocity.y = 0
+	else:
+		velocity.y += gravity * delta
+	if (player.is_on_floor() && Input.is_action_just_pressed(\"space\")):
+		velocity.y += -500 
+	if (direction.x != 0):
+		velocity.x = move_toward(velocity.x, speed * direction.x, accel * delta)
+	else:
+		velocity.x = move_toward(velocity.x, 0, friction * delta)
+	var dir = (get_global_mouse_position() - player.global_position)
+	flashlight.rotation = dir.normalized().angle()
+	move_and_slide()
+	
 "
 
 [sub_resource type="CanvasTexture" id="CanvasTexture_yw30f"]
 diffuse_texture = ExtResource("1_rkbax")
 normal_texture = ExtResource("2_rkbax")
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_rkbax"]
 
 [node name="Player" type="CharacterBody2D"]
 script = SubResource("GDScript_rkbax")
@@ -17,4 +62,27 @@ script = SubResource("GDScript_rkbax")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = SubResource("CanvasTexture_yw30f")
 
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 21)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_rkbax")
+
 [node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="flashlight" type="ColorRect" parent="."]
+light_mask = 0
+offset_left = -4.0
+offset_top = 10.0
+offset_right = 27.0
+offset_bottom = 18.0
+color = Color(0.96747106, 0.7669328, 0, 1)
+
+[node name="PointLight2D" type="PointLight2D" parent="flashlight"]
+position = Vector2(10, -11)
+rotation = -1.6032791
+scale = Vector2(3, 3)
+energy = 2.0
+shadow_enabled = true
+texture = ExtResource("3_g1dw6")
+offset = Vector2(-7, 107)
+texture_scale = 0.1

@@ -1,5 +1,9 @@
-PointLight2D
 LightOccluder2D
+ColorRect
+Polygon2D
+CollisionShape2D
+CollisionPolygon2D
+PointLight2D
 DirectionalLight2D
 Sprite2D
 Camera2D
