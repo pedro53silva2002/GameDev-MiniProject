@@ -1,7 +1,9 @@
+CollisionShape2D
+Area2D
+RayCast2D
 LightOccluder2D
 ColorRect
 Polygon2D
-CollisionShape2D
 CollisionPolygon2D
 PointLight2D
 DirectionalLight2D
@@ -10,5 +12,3 @@ Camera2D
 TileMapLayer
 CanvasModulate
 AnimatedSprite2D
-CharacterBody2D
-Node2D
