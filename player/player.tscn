@@ -1,8 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://c0angt1ohgxa0"]
+[gd_scene load_steps=10 format=3 uid="uid://c0angt1ohgxa0"]
 
 [ext_resource type="Texture2D" uid="uid://cjsqk701pjujb" path="res://assets/player/player.png" id="1_rkbax"]
 [ext_resource type="Texture2D" uid="uid://b3n12hsayw4be" path="res://assets/player/player_specular2.png" id="2_rkbax"]
 [ext_resource type="Texture2D" uid="uid://ccu61ecwbusgx" path="res://assets/tilemaps/istockphoto-1136961004-2048x2048.jpg" id="3_g1dw6"]
+[ext_resource type="Texture2D" uid="uid://jdntlyny1gtk" path="res://assets/player/flashlight.png" id="4_yw30f"]
+[ext_resource type="AudioStream" uid="uid://7sw5wi232yiq" path="res://assets/sounds/flashlight_click.wav" id="5_qjkh3"]
+[ext_resource type="FontFile" uid="uid://il7ommkr3mws" path="res://assets/fonts/pixel.ttf" id="6_g6k8r"]
 
 [sub_resource type="GDScript" id="GDScript_rkbax"]
 script/source = "extends CharacterBody2D
@@ -13,42 +16,103 @@ var speed : float = 200
 var accel : float = 200
 var friction : float = 200
 var gravity : float = 1000
-@onready var player: CharacterBody2D = $\".\"
-@onready var flashlight: ColorRect = $flashlight
-var rect_position = Vector2(0, 0)
-var rect_min_size = Vector2(100, 20)
+@onready var label: Label = $Label
+
+@onready var sprite: Sprite2D = $Sprite2D
+@onready var flashlight: Node2D = $Sprite2D/flashlight
+@onready var light: PointLight2D = $Sprite2D/flashlight/PointLight2D
+@onready var flashlightsound: AudioStreamPlayer2D = $Sprite2D/flashlight/AudioStreamPlayer2D
+
+var wobble_timer := 0.0
+var wobble_speed := 10        # velocidade do wobble
+var wobble_rot := 0.1          # rotação máxima
+var wobble_y := 0.5           # deslocamento vertical do sprite
+
+var original_sprite_pos := Vector2()
+
+func _ready():
+	original_sprite_pos = sprite.position
+
 
 func _input(event: InputEvent) -> void:
-	if (event.is_action_pressed(\"mouse_left\")):
-		if (flashlight.visible):
-			flashlight.visible = false
-		else:
-			flashlight.visible = true
+	if event.is_action_pressed(\"mouse_left\"):
+		light.visible = not light.visible
+		flashlightsound.playing = true
+		
+
 
 func _physics_process(delta):
 	move(delta)
-	
-#func _ready():
-	#nothing
-	
-	
+
+
 func move(delta):
+	# ----------------------------
+	# Movimento
+	# ----------------------------
 	direction.x = Input.get_action_strength(\"d\") - Input.get_action_strength(\"a\")
-	direction.y =  Input.get_action_strength(\"s\") - Input.get_action_strength(\"w\")
-	if (player.is_on_floor()):
+	direction.y = Input.get_action_strength(\"s\") - Input.get_action_strength(\"w\")
+
+	if is_on_floor():
 		velocity.y = 0
 	else:
 		velocity.y += gravity * delta
-	if (player.is_on_floor() && Input.is_action_just_pressed(\"space\")):
-		velocity.y += -500 
-	if (direction.x != 0):
+
+	if is_on_floor() and Input.is_action_just_pressed(\"space\"):
+		velocity.y -= 500
+
+	if direction.x != 0:
 		velocity.x = move_toward(velocity.x, speed * direction.x, accel * delta)
 	else:
 		velocity.x = move_toward(velocity.x, 0, friction * delta)
-	var dir = (get_global_mouse_position() - player.global_position)
-	flashlight.rotation = dir.normalized().angle()
+
+	# ----------------------------
+	# Flip pelo mouse
+	# ----------------------------
+	var mouse_x = get_global_mouse_position().x
+	if mouse_x < global_position.x:
+		flashlight.scale.y = -1
+		sprite.flip_h = true
+	else:
+		sprite.flip_h = false
+		flashlight.scale.y = 1
+
+	# ----------------------------
+	# Rotacionar lanterna
+	# ----------------------------
+	var dir = get_global_mouse_position() - global_position
+	flashlight.rotation = dir.angle()
+
+	# ----------------------------
+	# Wobble visual do sprite (Paper Mario style)
+	# ----------------------------
+	if is_on_floor():
+		var speed_ratio = clamp(abs(velocity.x) / speed, 0.0, 1.0)
+		wobble_timer += delta * wobble_speed * (0.5 + speed_ratio)
+		var wobble_dir = -1 if sprite.flip_h else 1
+
+		sprite.rotation = sin(wobble_timer) * wobble_rot * speed_ratio * wobble_dir
+		sprite.position.y = original_sprite_pos.y - abs(sin(wobble_timer * 2)) * wobble_y * speed_ratio
+	else:
+		sprite.rotation = 0
+		sprite.position = original_sprite_pos
+		wobble_timer = 0
+
+	# ----------------------------
+	# Mover
+	# ----------------------------
 	move_and_slide()
-	
+
+
+func door_entered(body: Node) -> void:
+	if body == self:  # only show label if the player entered
+		label.text = \"Press W to enter factory!\"
+		label.visible = true
+		print(\"door entered\")
+
+
+func door_exited(body: Node) -> void:
+	if body == self:  # only hide label if the player exited
+		label.visible = false
 "
 
 [sub_resource type="CanvasTexture" id="CanvasTexture_yw30f"]
@@ -60,26 +124,26 @@ normal_texture = ExtResource("2_rkbax")
 [node name="Player" type="CharacterBody2D"]
 script = SubResource("GDScript_rkbax")
 
+[node name="Label" type="Label" parent="."]
+offset_left = -97.0
+offset_top = -103.0
+offset_right = 100.0
+offset_bottom = -38.0
+theme_override_colors/font_outline_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("6_g6k8r")
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+vertical_alignment = 2
+
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = SubResource("CanvasTexture_yw30f")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 21)
-rotation = 1.5707964
-shape = SubResource("CapsuleShape2D_rkbax")
-
-[node name="Camera2D" type="Camera2D" parent="."]
-
-[node name="flashlight" type="ColorRect" parent="."]
+[node name="flashlight" type="Node2D" parent="Sprite2D"]
 light_mask = 0
-offset_left = -4.0
-offset_top = 10.0
-offset_right = 27.0
-offset_bottom = 18.0
-color = Color(0.96747106, 0.7669328, 0, 1)
 
-[node name="PointLight2D" type="PointLight2D" parent="flashlight"]
-position = Vector2(10, -11)
+[node name="PointLight2D" type="PointLight2D" parent="Sprite2D/flashlight"]
+visible = false
+position = Vector2(8.000001, -1.1920929e-07)
 rotation = -1.6032791
 scale = Vector2(3, 3)
 energy = 2.0
@@ -87,3 +151,17 @@ shadow_enabled = true
 texture = ExtResource("3_g1dw6")
 offset = Vector2(-7, 107)
 texture_scale = 0.1
+
+[node name="Sprite2D" type="Sprite2D" parent="Sprite2D/flashlight"]
+position = Vector2(7, 13)
+texture = ExtResource("4_yw30f")
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="Sprite2D/flashlight"]
+stream = ExtResource("5_qjkh3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 21)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_rkbax")
+
+[node name="Camera2D" type="Camera2D" parent="."]
